@@ -26,6 +26,7 @@ let btn_active = [false, false, false, false];
 //수정 삭제 버튼
 const delete_btn = document.querySelector(".btnDel");
 let modify_cnt = 0;
+let open_input = []; //열려있는 지 닫혀있는지 판단하는 배열 - 열려있으면 true 닫혀있으면 false
 
 // 테이블 헤드 생성
 const tableWrap = document.querySelector(".main-wrap");
@@ -54,8 +55,8 @@ function dataPrint() {
           <div class="inputCareer" id = inputcareer${index}>${item.career}</div>
           <div class="inputNickname">${item.nickname}</div>
         <div>
-          <button class="btnCor" index = ${index} id = modify_${index} onClick = "modify_fuc(${index})">수정</button>
-          <button class="btnDel" index = ${index} onClick = "delete_fuc(${index})">삭제</button>
+          <button class="btnCor" id = modify_${index} onClick = "modify_fuc(${index})">수정</button>
+          <button class="btnDel" id = delete_${index} onClick = "delete_fuc(${index})">삭제</button>
         </div>
       </div>
       `;
@@ -209,29 +210,32 @@ function modify_input_bot_fuc(btn) {
   }
   console.log("modify_cnt 함수", modify_cnt);
 }
-let change_title = 0;
+
 //수정 버튼 클릭 함수
 function modify_fuc(event) {
+  console.log("modify 함수 실행 중 : ", event);
   const career = document.getElementById(`inputcareer${event}`);
+  const modify_btn = document.getElementById(`modify_${event}`);
   let sub_input = data_map[event].career; //현재 데이터에서 위치값 가져오기
+  console.log("sub_input", sub_input);
   let modify_inner = "";
-  if (change_title === 0) {
+
+  if (modify_btn.innerText === "수정") {
+    open_input[event] = true;
     //버튼을 처음 누른 상태
-    const modify_btn = document.getElementById(`modify_${event}`);
-    console.log(event);
-    //console.log("modify_${event}", `modify_${event}`);
     modify_btn.innerHTML = "<div>수정완료</div>";
     career.innerHTML = `<input class="modify_input" onkeyup="modify_input_bot_fuc(${event})"/><div class="modify_input_fuc"></div>`;
-    console.log("modify_cnt", modify_cnt);
+
     if (modify_cnt === 1) {
       //수정 버튼 x
       modify_btn.disabled = true;
     } else {
       modify_btn.disabled = false;
     }
-    //career.innerHTML = `<input class="modify_input"/><div>${depend_input()}</div>`;
+
     document.querySelector(".modify_input").value = sub_input; //기존의 커리어값을 input 값에 삽입
     modify_inner = document.querySelector(".modify_input").value; //수정한 값을 변수에 삽입
+
     if (sub_input.length < 15) {
       document.querySelector(
         ".modify_input_fuc"
@@ -240,31 +244,26 @@ function modify_fuc(event) {
     } else {
       modify_btn.disabled = false;
     }
-
-    change_title = 1;
   } else {
     //수정 완료를 누른 상태
-    const modify_btn = document.querySelector(".btnCor"); //수정버튼 가지고 오기
+    open_input[event] = false;
     modify_inner = document.querySelector(".modify_input").value; //수정한 값을 변수에 삽입
     modify_btn.innerHTML = "<div>수정</div>";
     career.innerHTML = `<div>${modify_inner}</div>`; // 커리어 div값 수정
 
     //data_map 값 수정하기
     data_map[event].career = modify_inner;
-    change_title = 0;
-    //dataPrint();
-    window.localStorage.setItem("_data", JSON.stringify(data_map));
 
-    //console.log("modify_inner", modify_inner);
-    //console.log("sub_input", sub_input);
-    //console.log("data", data_map[event]);
+    window.localStorage.setItem("_data", JSON.stringify(data_map));
   }
+  console.log("open_input", open_input);
 }
+
 //삭제 버튼 클릭 함수
 function delete_fuc(event) {
   //console.log("event", event); // 해당 위치 행 값
-  data_map.splice(event - 1, 1);
-  id_arr.splice(event - 1, 1);
+  data_map.splice(event, 1);
+  id_arr.splice(event, 1);
   window.localStorage.setItem("_data", JSON.stringify(data_map));
   dataPrint();
 }
