@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="./style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="input-wrap">
+      <input
+        type="number"
+        placeholder="아이디를 입력해 주세요."
+        id="id_input"
+        onkeyup="printId()"
+      />
+      <div id="error_id"></div>
+
+      <input placeholder="이름을 입력해 주세요." id="name_input" />
+      <div id="error_name"></div>
+
+      <input
+        type="number"
+        placeholder="나이를 입력해 주세요."
+        id="age_input"
+        onkeyup="printAge()"
+      />
+      <div id="error_age"></div>
+
+      <input
+        placeholder="경력을 입력해 주세요."
+        id="career_input"
+        minlength="15"
+        onkeyup="printCareer()"
+      />
+      <div id="error_career"></div>
+
+      <input
+        placeholder="별명을 입력해 주세요."
+        id="nickname_input"
+        minlength="2"
+        onkeyup="printNickName()"
+      />
+      <div id="error_nickname"></div>
+
+      <button id="save">저장</button>
+    </div>
+
+    <!-- 테이블 작업 -->
+    <div class="main-wrap"></div>
+  </body>
+  <script src="./index.js"></script>
+</html>
