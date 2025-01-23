@@ -24,8 +24,8 @@ const save_btn = document.getElementById("save");
 let btn_active = [false, false, false, false];
 
 //수정 삭제 버튼
-
 const delete_btn = document.querySelector(".btnDel");
+let modify_cnt = 0;
 
 // 테이블 헤드 생성
 const tableWrap = document.querySelector(".main-wrap");
@@ -193,6 +193,22 @@ function jugment(content) {
   }
 }
 
+//input에서 15자 이상 판단 함수
+function modify_input_bot_fuc(btn) {
+  const m_btn = document.getElementById(`modify_${btn}`);
+  //console.log("m_btn", m_btn);
+  const content = document.querySelector(".modify_input").value;
+  if (content.length < 15) {
+    document.querySelector(
+      ".modify_input_fuc"
+    ).innerHTML = `<div>15자 이상으로 작성하시오</div>`;
+    m_btn.disabled = true; //수정버튼 클릭 x
+  } else {
+    document.querySelector(".modify_input_fuc").innerHTML = `<div></div>`;
+    m_btn.disabled = false;
+  }
+  console.log("modify_cnt 함수", modify_cnt);
+}
 let change_title = 0;
 //수정 버튼 클릭 함수
 function modify_fuc(event) {
@@ -202,12 +218,28 @@ function modify_fuc(event) {
   if (change_title === 0) {
     //버튼을 처음 누른 상태
     const modify_btn = document.getElementById(`modify_${event}`);
+    console.log(event);
     //console.log("modify_${event}", `modify_${event}`);
     modify_btn.innerHTML = "<div>수정완료</div>";
-    career.innerHTML = `<input class="modify_input"/>`;
+    career.innerHTML = `<input class="modify_input" onkeyup="modify_input_bot_fuc(${event})"/><div class="modify_input_fuc"></div>`;
+    console.log("modify_cnt", modify_cnt);
+    if (modify_cnt === 1) {
+      //수정 버튼 x
+      modify_btn.disabled = true;
+    } else {
+      modify_btn.disabled = false;
+    }
+    //career.innerHTML = `<input class="modify_input"/><div>${depend_input()}</div>`;
     document.querySelector(".modify_input").value = sub_input; //기존의 커리어값을 input 값에 삽입
     modify_inner = document.querySelector(".modify_input").value; //수정한 값을 변수에 삽입
-    //console.log(data_map[event].career); //현재 버튼 클릭 위치의 커리어 값
+    if (sub_input.length < 15) {
+      document.querySelector(
+        ".modify_input_fuc"
+      ).innerHTML = `<div>15자 이상으로 작성하시오</div>`;
+      modify_btn.disabled = true;
+    } else {
+      modify_btn.disabled = false;
+    }
 
     change_title = 1;
   } else {
@@ -216,15 +248,16 @@ function modify_fuc(event) {
     modify_inner = document.querySelector(".modify_input").value; //수정한 값을 변수에 삽입
     modify_btn.innerHTML = "<div>수정</div>";
     career.innerHTML = `<div>${modify_inner}</div>`; // 커리어 div값 수정
+
     //data_map 값 수정하기
     data_map[event].career = modify_inner;
     change_title = 0;
     //dataPrint();
     window.localStorage.setItem("_data", JSON.stringify(data_map));
 
-    console.log("modify_inner", modify_inner);
-    console.log("sub_input", sub_input);
-    console.log("data", data_map[event]);
+    //console.log("modify_inner", modify_inner);
+    //console.log("sub_input", sub_input);
+    //console.log("data", data_map[event]);
   }
 }
 //삭제 버튼 클릭 함수
@@ -266,7 +299,6 @@ window.onload = function () {
     window.localStorage.setItem("_data", JSON.stringify(data_map));
     dummy_map = window.localStorage.getItem("_data");
 
-    //jugment(infoData);
     //데이터 data_map에 push 후 해당 input 초기화
     id_input.value = "";
     name_input.value = "";
@@ -276,7 +308,5 @@ window.onload = function () {
 
     //table에 행 달기
     dataPrint();
-    //delete_btn.addEventListener("click", delete_fuc);
-    //console.log(data_map);
   });
 };

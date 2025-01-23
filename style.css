@@ -162,6 +162,16 @@ input:focus {
   justify-content: space-between;
   gap: 10px;
 }
+
+.inputCareer {
+  display: block;
+  flex-direction: column;
+}
 .modify_input {
+  display: block;
   width: 200px;
+}
+.modify_input_fuc {
+  display: block;
+  width: 100%;
 }
