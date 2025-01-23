@@ -26,7 +26,6 @@ let btn_active = [false, false, false, false];
 //수정 삭제 버튼
 const delete_btn = document.querySelector(".btnDel");
 let modify_cnt = 0;
-let open_input = []; //열려있는 지 닫혀있는지 판단하는 배열 - 열려있으면 true 닫혀있으면 false
 
 // 테이블 헤드 생성
 const tableWrap = document.querySelector(".main-wrap");
@@ -151,7 +150,6 @@ function printNickName_den() {
     return true;
   }
 }
-
 //잘못된 저장 확인 함수
 function jugment(content) {
   let cnt = 0;
@@ -208,64 +206,73 @@ function modify_input_bot_fuc(btn) {
     document.querySelector(".modify_input_fuc").innerHTML = `<div></div>`;
     m_btn.disabled = false;
   }
-  console.log("modify_cnt 함수", modify_cnt);
 }
-
 //수정 버튼 클릭 함수
 function modify_fuc(event) {
-  console.log("modify 함수 실행 중 : ", event);
   const career = document.getElementById(`inputcareer${event}`);
   const modify_btn = document.getElementById(`modify_${event}`);
-  let sub_input = data_map[event].career; //현재 데이터에서 위치값 가져오기
-  console.log("sub_input", sub_input);
-  let modify_inner = "";
+  const currentValue = data_map[event].career;
 
+  // 수정 버튼을 처음 누른 상태
   if (modify_btn.innerText === "수정") {
-    open_input[event] = true;
-    //버튼을 처음 누른 상태
     modify_btn.innerHTML = "<div>수정완료</div>";
-    career.innerHTML = `<input class="modify_input" onkeyup="modify_input_bot_fuc(${event})"/><div class="modify_input_fuc"></div>`;
 
-    if (modify_cnt === 1) {
-      //수정 버튼 x
-      modify_btn.disabled = true;
-    } else {
-      modify_btn.disabled = false;
-    }
+    // 기존 데이터를 input 필드로 교체
+    career.innerHTML = `
+      <input class="modify_input" value="${currentValue}" onclick="modify_input_bot_fuc(${event})" /><div class="modify_input_fuc"></div>
+    `;
 
-    document.querySelector(".modify_input").value = sub_input; //기존의 커리어값을 input 값에 삽입
-    modify_inner = document.querySelector(".modify_input").value; //수정한 값을 변수에 삽입
+    const inputField = career.querySelector(".modify_input");
+    const messageDiv = career.querySelector(".modify_input_fuc");
 
-    if (sub_input.length < 15) {
-      document.querySelector(
-        ".modify_input_fuc"
-      ).innerHTML = `<div>15자 이상으로 작성하시오</div>`;
-      modify_btn.disabled = true;
-    } else {
-      modify_btn.disabled = false;
-    }
+    // 입력값 글자 수 검사
+    inputField.addEventListener("input", () => {
+      const newValue = inputField.value;
+      if (newValue.length < 15) {
+        messageDiv.innerText = "15자 이상으로 작성하시오.";
+        modify_btn.disabled = true;
+      } else {
+        messageDiv.innerText = "";
+        modify_btn.disabled = false;
+      }
+    });
   } else {
-    //수정 완료를 누른 상태
-    open_input[event] = false;
-    modify_inner = document.querySelector(".modify_input").value; //수정한 값을 변수에 삽입
+    // 수정 완료 상태
+    const newValue = career.querySelector(".modify_input").value;
+
+    data_map[event].career = newValue;
+    career.innerHTML = `<div>${newValue}</div>`;
     modify_btn.innerHTML = "<div>수정</div>";
-    career.innerHTML = `<div>${modify_inner}</div>`; // 커리어 div값 수정
 
-    //data_map 값 수정하기
-    data_map[event].career = modify_inner;
-
+    // 로컬 스토리지 업데이트
     window.localStorage.setItem("_data", JSON.stringify(data_map));
   }
-  console.log("open_input", open_input);
 }
 
 //삭제 버튼 클릭 함수
 function delete_fuc(event) {
   //console.log("event", event); // 해당 위치 행 값
+  // const tbBody = document.querySelector(".tBody");
+  // tbBody.remove(data_map[event]);
+
+  // const del = document.getElementById(`delete_${event}`);
+  // del.parentNode.parentNode.parentElement.remove(del);
+  // console.log(del.parentNode.parentNode.parentElement);
+
+  data_map.map((element) => {
+    //console.log(element._id);
+    if (element._id === data_map[event]._id) {
+      //삭제 버튼을 누른 위치라면
+      const del = document.getElementById(`delete_${event}`);
+      del.parentNode.parentNode.remove(del);
+    }
+  });
+
   data_map.splice(event, 1);
   id_arr.splice(event, 1);
   window.localStorage.setItem("_data", JSON.stringify(data_map));
-  dataPrint();
+
+  //dataPrint();
 }
 
 //window 로드 이벤트
