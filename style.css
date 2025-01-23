@@ -1,16 +1,18 @@
 /* 색상 정의 */
 :root {
-  --main-color: #badfee; /* 하늘색 */
+  --main-color: #87cefa; /* 좀 더 선명한 하늘색 */
+  --secondary-color: #6ca6cd; /* 메인 색상의 어두운 버전 */
   --error-color: #ff6b6b; /* 오류 메시지 빨간색 */
   --input-bg: #f5faff; /* 입력 박스 배경색 */
   --disabled-color: #b0b0b0f7; /* 비활성화 버튼 색상 */
   --table-header-bg: #f4f4f4; /* 테이블 헤더 배경색 */
   --table-border: #ddd; /* 테이블 테두리 */
+  --button-hover: #5e92b6; /* 버튼 hover 효과 색상 */
 }
 
 /* 전체 레이아웃 */
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f9f9f9;
@@ -43,11 +45,12 @@ input {
   box-sizing: border-box;
   font-size: 14px;
   background-color: var(--input-bg);
-  transition: border-color 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 input:focus {
   border-color: var(--main-color);
+  box-shadow: 0 0 5px var(--main-color);
   outline: none;
 }
 
@@ -81,7 +84,7 @@ input:focus {
 }
 
 #save:active {
-  background-color: #a4d2e6;
+  background-color: var(--secondary-color);
   transform: scale(0.98);
 }
 
@@ -127,29 +130,38 @@ input:focus {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   padding: 10px;
-  border-bottom: 1px solid var(--table-border);
   align-items: center;
 }
 
 /* 버튼 내부 스타일 */
 .btnCor,
 .btnDel {
-  padding: 6px 12px;
+  padding: 8px 16px;
   font-size: 14px;
   border: none;
   border-radius: 6px;
   color: white;
   cursor: pointer;
   margin: 0 4px;
+  display: inline-block;
+  background-color: var(--secondary-color);
+  transition: background-color 0.3s, transform 0.2s;
 }
 
-.btnCor,
+.btnCor {
+  background-color: var(--main-color); /* 수정 버튼: 하늘색 */
+}
+
 .btnDel {
-  background-color: gray; /* 수정 버튼: 녹색 */
+  background-color: var(--error-color); /* 삭제 버튼: 빨간색 */
 }
 
-.btnCor:disabled,
-.btnDel:disabled {
-  background-color: var(--disabled-color);
-  cursor: not-allowed;
+/* 수정, 삭제 버튼 가로 배치 */
+.table .tBody div div:last-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.modify_input {
+  width: 200px;
 }
