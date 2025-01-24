@@ -49,8 +49,8 @@ function dataPrint() {
     .map((item, index) => {
       return `
       <div>
-          <div class="inputName">${item.name}</div>
-          <div class="inputAge">${item.age}</div>
+          <div class="inputName" id = inputname${item._id}>${item.name}</div>
+          <div class="inputAge" id = inputage${item._id}>${item.age}</div>
           <div class="inputCareer" id = inputcareer${item._id}>${item.career}</div>
           <div class="inputNickname">${item.nickname}</div>
         <div>
@@ -195,24 +195,36 @@ function jugment(content) {
 //수정 버튼 클릭 함수
 function modify_fuc(event) {
   //event는 item._id값
-  const career = document.getElementById(`inputcareer${event}`);
-  const modify_btn = document.getElementById(`modify_${event}`);
-  const currentValue = career.textContent; //현재 행의 커리어 값
-  //console.log("career", career.textContent);
-  //console.log("career.id", career.id);
-  //console.log("data_map", data_map);
-  //console.log("modify_btn", modify_btn);
+
+  const modify_btn = document.getElementById(`modify_${event}`); //수정버튼
+  const career = document.getElementById(`inputcareer${event}`); //현재행의 career
+  const name = document.getElementById(`inputname${event}`); // 현재행의 name
+  const age = document.getElementById(`inputage${event}`); //현재행의 age
+
+  //현재 행 값
+  const currentValue = career.textContent;
+  const currentValue_name = name.textContent;
+  const currentValue_age = age.textContent;
 
   if (modify_btn.innerText === "수정") {
     modify_btn.innerHTML = "<div>수정완료</div>";
 
     // 기존 데이터를 input 필드로 교체
     career.innerHTML = `<input class="modify_input${event}" value="${currentValue}"/><div class="modify_input_fuc"></div>`;
+    name.innerHTML = `<input class="modify_input_name${event}" value="${currentValue_name}"/><div class="modify_input_name_fuc"></div>`;
+    age.innerHTML = `<input class="modify_input_age${event}" value="${currentValue_age}"/><div class="modify_input_age_fuc"></div>`;
 
+    //input content
     const inputField = career.querySelector(`.modify_input${event}`);
-    const messageDiv = career.querySelector(".modify_input_fuc"); //15자 판단 내용
+    const messageDiv = career.querySelector(".modify_input_fuc");
 
-    // 입력값 글자 수 검사
+    const inputField_name = name.querySelector(`.modify_input_name${event}`);
+    const messageDiv_name = name.querySelector(".modify_input_name_fuc");
+
+    const inputField_age = age.querySelector(`.modify_input_age${event}`);
+    const messageDiv_age = age.querySelector(".modify_input_age_fuc");
+
+    // career -  입력값 글자 수 검사
     inputField.addEventListener("input", () => {
       const newValue = inputField.value;
       if (newValue.length < 15) {
@@ -223,13 +235,44 @@ function modify_fuc(event) {
         modify_btn.disabled = false;
       }
     });
+
+    // name - 공백 확인
+    inputField_name.addEventListener("input", () => {
+      const newValue_name = inputField_name.value;
+      if (newValue_name.length === 0) {
+        messageDiv_name.innerText = "글자를 입력하시오";
+        modify_btn.disabled = true;
+      } else {
+        messageDiv_name.innerText = "";
+        modify_btn.disabled = false;
+      }
+    });
+
+    // age - 나이 확인(150살 이내)
+    inputField_age.addEventListener("input", () => {
+      const newValue_age = inputField_age.value;
+      if (newValue_age > 150) {
+        messageDiv_age.innerText = "150살 이내로 작성하시오";
+        modify_btn.disabled = true;
+      } else {
+        messageDiv_age.innerText = "";
+        modify_btn.disabled = false;
+      }
+    });
   } else {
     // 수정 완료 상태
     const newValue = career.querySelector(`.modify_input${event}`).value;
-    console.log("newvalue", newValue);
+    const newValue_name = name.querySelector(
+      `.modify_input_name${event}`
+    ).value;
+    const newValue_age = age.querySelector(`.modify_input_age${event}`).value;
 
-    //career.textContent = newValue;
+    //innerHTML 수정
     career.innerHTML = `<div>${newValue}</div>`;
+    name.innerHTML = `<div>${newValue_name}</div>`;
+    age.innerHTML = `<div>${newValue_age}</div>`;
+
+    //버튼 수정
     modify_btn.innerHTML = "<div>수정</div>";
 
     //localStorge
@@ -240,7 +283,9 @@ function modify_fuc(event) {
       if (Number(element._id) === event) {
         return {
           ...element,
+          name: newValue_name,
           career: newValue,
+          age: newValue_age,
         };
       } else {
         return {
@@ -249,7 +294,8 @@ function modify_fuc(event) {
       }
       //console.log("element 이후", element);
     });
-
+    data_map = new_data;
+    console.log(new_data);
     window.localStorage.setItem("_data", JSON.stringify(new_data));
   }
 }
@@ -257,25 +303,6 @@ function modify_fuc(event) {
 //삭제 버튼 클릭 함수
 function delete_fuc(event) {
   console.log("event", event); // 해당 행의 id값 반환
-  // const tbBody = document.querySelector(".tBody");
-  // tbBody.remove(data_map[event]);
-
-  /*
-  삭제 버튼이 클릭된 행을 삭제! - 목표
-  1. 해당 행의 위치를 찾는다 
-  2. 테이블 값을 삭제한다
-  3. 로컬도 삭제한다
-  */
-  // const del = document.getElementById(`delete_${event}`);
-  // console.log(del);
-  // console.log(
-  //   "del.parentNode.parentNode.parentNode",
-  //   del.parentNode.parentNode.parentNode
-  // );
-  // del.parentNode.parentNode.parentNode.removeChild(event);
-  // const del = document.getElementById(`delete_${event}`);
-  // del.parentNode.parentNode.parentElement.remove(del);
-  // console.log(del.parentNode.parentNode.parentElement);
 
   const new_data = data_map.filter((item) => Number(item._id) !== event);
 
@@ -284,21 +311,6 @@ function delete_fuc(event) {
   del.parentNode.parentNode.remove(del);
 
   window.localStorage.setItem("_data", JSON.stringify(new_data));
-
-  // data_map.map((element, index) => {
-  //   console.log("del", index);
-  //   if (element._id === data_map[event]._id) {
-  //     //삭제 버튼을 누른 위치라면
-  //     const del = document.getElementById(`delete_${event}`);
-  //     del.parentNode.parentNode.remove(del);
-  //   }
-  // });
-
-  // data_map.splice(event, 1);
-  // id_arr.splice(event, 1);
-  // window.localStorage.setItem("_data", JSON.stringify(data_map));
-
-  //dataPrint();
 }
 
 //window 로드 이벤트
@@ -327,7 +339,7 @@ window.onload = function () {
     id_arr.push(infoData._id);
     data_map.push(infoData);
     jugment(infoData);
-    //console.log("data_map", data_map);
+
     window.localStorage.setItem("_data", JSON.stringify(data_map));
     dummy_map = window.localStorage.getItem("_data");
 

@@ -96,7 +96,7 @@ input:focus {
 /* 테이블 래퍼 */
 .main-wrap {
   width: 100%;
-  max-width: 650px;
+  max-width: 900px;
   margin: 20px auto;
   background-color: white;
   padding: 20px;
@@ -136,6 +136,8 @@ input:focus {
 /* 버튼 내부 스타일 */
 .btnCor,
 .btnDel {
+  width: 80px;
+  height: 50pz;
   padding: 8px 16px;
   font-size: 14px;
   border: none;
@@ -160,7 +162,7 @@ input:focus {
 .table .tBody div div:last-child {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 5px;
 }
 
 .inputCareer {
@@ -169,9 +171,18 @@ input:focus {
 }
 .inputCareer > input {
   display: block;
-  width: 200px;
+  width: 150px;
 }
-.modify_input_fuc {
+.inputAge > input {
+  display: block;
+  width: 100px;
+}
+.inputName > input {
+  display: block;
+  width: 100px;
+}
+.modify_input_fuc,
+.modify_input_name {
   display: block;
   width: 100%;
 }
