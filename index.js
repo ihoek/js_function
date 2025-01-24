@@ -51,11 +51,11 @@ function dataPrint() {
       <div>
           <div class="inputName">${item.name}</div>
           <div class="inputAge">${item.age}</div>
-          <div class="inputCareer" id = inputcareer${index}>${item.career}</div>
+          <div class="inputCareer" id = inputcareer${item._id}>${item.career}</div>
           <div class="inputNickname">${item.nickname}</div>
         <div>
-          <button class="btnCor" id = modify_${index} onClick = "modify_fuc(${index})">수정</button>
-          <button class="btnDel" id = delete_${index} onClick = "delete_fuc(${index})">삭제</button>
+          <button class="btnCor" id = modify_${item._id} onClick = "modify_fuc(${item._id})">수정</button>
+          <button class="btnDel" id = delete_${item._id} onClick = "delete_fuc(${item._id})">삭제</button>
         </div>
       </div>
       `;
@@ -192,38 +192,25 @@ function jugment(content) {
   }
 }
 
-//input에서 15자 이상 판단 함수
-function modify_input_bot_fuc(btn) {
-  const m_btn = document.getElementById(`modify_${btn}`);
-  //console.log("m_btn", m_btn);
-  const content = document.querySelector(".modify_input").value;
-  if (content.length < 15) {
-    document.querySelector(
-      ".modify_input_fuc"
-    ).innerHTML = `<div>15자 이상으로 작성하시오</div>`;
-    m_btn.disabled = true; //수정버튼 클릭 x
-  } else {
-    document.querySelector(".modify_input_fuc").innerHTML = `<div></div>`;
-    m_btn.disabled = false;
-  }
-}
 //수정 버튼 클릭 함수
 function modify_fuc(event) {
+  //event는 item._id값
   const career = document.getElementById(`inputcareer${event}`);
   const modify_btn = document.getElementById(`modify_${event}`);
-  const currentValue = data_map[event].career;
+  const currentValue = career.textContent; //현재 행의 커리어 값
+  //console.log("career", career.textContent);
+  //console.log("career.id", career.id);
+  //console.log("data_map", data_map);
+  //console.log("modify_btn", modify_btn);
 
-  // 수정 버튼을 처음 누른 상태
   if (modify_btn.innerText === "수정") {
     modify_btn.innerHTML = "<div>수정완료</div>";
 
     // 기존 데이터를 input 필드로 교체
-    career.innerHTML = `
-      <input class="modify_input" value="${currentValue}" onclick="modify_input_bot_fuc(${event})" /><div class="modify_input_fuc"></div>
-    `;
+    career.innerHTML = `<input class="modify_input${event}" value="${currentValue}"/><div class="modify_input_fuc"></div>`;
 
-    const inputField = career.querySelector(".modify_input");
-    const messageDiv = career.querySelector(".modify_input_fuc");
+    const inputField = career.querySelector(`.modify_input${event}`);
+    const messageDiv = career.querySelector(".modify_input_fuc"); //15자 판단 내용
 
     // 입력값 글자 수 검사
     inputField.addEventListener("input", () => {
@@ -238,39 +225,78 @@ function modify_fuc(event) {
     });
   } else {
     // 수정 완료 상태
-    const newValue = career.querySelector(".modify_input").value;
+    const newValue = career.querySelector(`.modify_input${event}`).value;
+    console.log("newvalue", newValue);
 
-    data_map[event].career = newValue;
+    //career.textContent = newValue;
     career.innerHTML = `<div>${newValue}</div>`;
     modify_btn.innerHTML = "<div>수정</div>";
 
-    // 로컬 스토리지 업데이트
-    window.localStorage.setItem("_data", JSON.stringify(data_map));
+    //localStorge
+    let new_data = data_map.map((element) => {
+      //console.log("ele id", typeof element._id);
+      //console.log("event", typeof event);
+      //console.log("element 이전", element);
+      if (Number(element._id) === event) {
+        return {
+          ...element,
+          career: newValue,
+        };
+      } else {
+        return {
+          ...element,
+        };
+      }
+      //console.log("element 이후", element);
+    });
+
+    window.localStorage.setItem("_data", JSON.stringify(new_data));
   }
 }
 
 //삭제 버튼 클릭 함수
 function delete_fuc(event) {
-  //console.log("event", event); // 해당 위치 행 값
+  console.log("event", event); // 해당 행의 id값 반환
   // const tbBody = document.querySelector(".tBody");
   // tbBody.remove(data_map[event]);
 
+  /*
+  삭제 버튼이 클릭된 행을 삭제! - 목표
+  1. 해당 행의 위치를 찾는다 
+  2. 테이블 값을 삭제한다
+  3. 로컬도 삭제한다
+  */
+  // const del = document.getElementById(`delete_${event}`);
+  // console.log(del);
+  // console.log(
+  //   "del.parentNode.parentNode.parentNode",
+  //   del.parentNode.parentNode.parentNode
+  // );
+  // del.parentNode.parentNode.parentNode.removeChild(event);
   // const del = document.getElementById(`delete_${event}`);
   // del.parentNode.parentNode.parentElement.remove(del);
   // console.log(del.parentNode.parentNode.parentElement);
 
-  data_map.map((element) => {
-    //console.log(element._id);
-    if (element._id === data_map[event]._id) {
-      //삭제 버튼을 누른 위치라면
-      const del = document.getElementById(`delete_${event}`);
-      del.parentNode.parentNode.remove(del);
-    }
-  });
+  const new_data = data_map.filter((item) => Number(item._id) !== event);
 
-  data_map.splice(event, 1);
-  id_arr.splice(event, 1);
-  window.localStorage.setItem("_data", JSON.stringify(data_map));
+  data_map = new_data;
+  const del = document.getElementById(`delete_${event}`);
+  del.parentNode.parentNode.remove(del);
+
+  window.localStorage.setItem("_data", JSON.stringify(new_data));
+
+  // data_map.map((element, index) => {
+  //   console.log("del", index);
+  //   if (element._id === data_map[event]._id) {
+  //     //삭제 버튼을 누른 위치라면
+  //     const del = document.getElementById(`delete_${event}`);
+  //     del.parentNode.parentNode.remove(del);
+  //   }
+  // });
+
+  // data_map.splice(event, 1);
+  // id_arr.splice(event, 1);
+  // window.localStorage.setItem("_data", JSON.stringify(data_map));
 
   //dataPrint();
 }

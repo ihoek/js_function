@@ -167,7 +167,7 @@ input:focus {
   display: block;
   flex-direction: column;
 }
-.modify_input {
+.inputCareer > input {
   display: block;
   width: 200px;
 }
